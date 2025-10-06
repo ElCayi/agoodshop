@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>aGoodShop · Carrito</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="header">
+    <h1>aGoodShop <span class="badge">Actividad 1</span></h1>
+    <p class="subtitle">POO · Fetch (API) · DOM</p>
+  </header>
+
+  <main class="container">
+    <section class="products">
+      <h2>Productos</h2>
+      <!-- Se rellenará dinámicamente -->
+      <div id="product-list" class="product-list"></div>
+    </section>
+
+    <aside class="cart">
+      <h2>Carrito</h2>
+      <div class="cart-total">
+        <span>Total:</span>
+        <strong id="total">0,00 €</strong>
+      </div>
+      <div class="cart-actions">
+        <button id="btn-clear" type="button">Vaciar carrito</button>
+        <button id="btn-dump" type="button">Ver JSON carrito</button>
+      </div>
+      <pre id="dump" class="dump" hidden></pre>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <small>Recuerda cambiar <code>API_URL</code> en <code>app.js</code> por tu JSONBlob.</small>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
