@@ -1,19 +1,12 @@
-// Clase Carrito: núcleo de negocio. No toca el DOM.
+// Clase Carrito: lógica de negocio. No toca el DOM
 export class Carrito {
-  /**
-   * @param {Array<{sku:string,title:string,price:number}>} catalogo
-   * @param {string} currency
-   */
   constructor(catalogo = [], currency = "€") {
-    /** @type {Map<string, {sku:string,title:string,price:number,quantity:number}>} */
-    this.lineas = new Map();
+    this.lineas = new Map();   
     this.currency = currency;
     if (catalogo.length) this.cargarCatalogo(catalogo);
   }
 
-  /**
-   * Carga/actualiza el catálogo. Resetea cantidades a 0 si no hay persistencia previa.
-   */
+  // Carga/actualiza el catálogo (mantiene cantidades si ya existían)
   cargarCatalogo(catalogo) {
     for (const p of catalogo) {
       const sku = p.sku;
@@ -23,11 +16,7 @@ export class Carrito {
     }
   }
 
-  /**
-   * Actualiza el número de unidades de un producto (no negativas).
-   * @param {string} sku
-   * @param {number} unidades
-   */
+  // Cambia unidades (siempre entero >= 0)
   actualizarUnidades(sku, unidades) {
     const linea = this.lineas.get(sku);
     if (!linea) return;
@@ -35,20 +24,14 @@ export class Carrito {
     linea.quantity = q;
   }
 
-  /**
-   * Devuelve datos esenciales de un producto + unidades seleccionadas.
-   * @param {string} sku
-   * @returns {{sku:string, quantity:number} | null}
-   */
+  // Info mínima de un producto en el carrito
   obtenerInformacionProducto(sku) {
     const linea = this.lineas.get(sku);
     if (!linea) return null;
     return { sku: linea.sku, quantity: linea.quantity };
   }
 
-  /**
-   * Devuelve un resumen del carrito con total, moneda y productos seleccionados.
-   */
+  // Resumen del carrito (total + líneas con quantity > 0)
   obtenerCarrito() {
     const productos = Array.from(this.lineas.values()).filter(l => l.quantity > 0);
     const total = productos.reduce((acc, l) => acc + l.price * l.quantity, 0);
@@ -65,9 +48,7 @@ export class Carrito {
     };
   }
 
-  /**
-   * Serializa estado (para localStorage).
-   */
+  // Serializa el estado (para localStorage)
   toJSON() {
     return JSON.stringify({
       currency: this.currency,
@@ -75,10 +56,7 @@ export class Carrito {
     });
   }
 
-  /**
-   * Restaura estado desde JSON (si coincide el catálogo, respeta títulos y precios).
-   * @param {string} json
-   */
+  // Restaura el estado desde JSON (si el SKU existe en el catálogo actual)
   fromJSON(json) {
     try {
       const obj = JSON.parse(json);
@@ -87,9 +65,14 @@ export class Carrito {
       for (const l of obj.lines) {
         if (this.lineas.has(l.sku)) {
           const actual = this.lineas.get(l.sku);
-          this.lineas.set(l.sku, { ...actual, quantity: Math.max(0, Math.trunc(l.quantity || 0)) });
+          this.lineas.set(l.sku, {
+            ...actual,
+            quantity: Math.max(0, Math.trunc(l.quantity || 0))
+          });
         }
       }
-    } catch {}
+    } catch {
+      // Silenciar errores de parseo
+    }
   }
 }

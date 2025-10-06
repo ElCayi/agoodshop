@@ -1,38 +1,29 @@
 import { Carrito } from './carrito.js';
 
-/** 
- * Paso 0: Configura tu API JSONBlob con el formato de api.example.json
- * y pega aquí la URL que te da (termina en /api/xxxxxxxx).
- */
-const API_URL = "REEMPLAZA_CON_TU_JSONBLOB_API_URL";
+// app.js
+const API_URL = "https://mocki.io/v1/d8fb0939-4741-4fa2-9542-e87276329aa8";
 
 // Selectores del DOM
 const $list = document.getElementById('product-list');
 const $total = document.getElementById('total');
 const $btnClear = document.getElementById('btn-clear');
-const $btnDump = document.getElementById('btn-dump');
-const $dump = document.getElementById('dump');
 
-// Helpers
+// Key para localStorage
 const LS_KEY = 'agoodshop_cart_v1';
 
-/** Formatea con moneda, manteniendo el símbolo del JSON */
+//Muestra número con 2 decimales y símbolo de moneda
 function formatCurrency(num, currency) {
   const n = Number(num);
-  // Mostramos coma como separador decimal para ES
   const formatted = n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  // Si el símbolo es "€", convención: "1.234,56 €"
   if (currency.trim() === '€') return `${formatted} ${currency}`;
-  // Para otras monedas, anteponer por simplicidad
   return `${currency}${formatted}`;
 }
 
-/** Carga catálogo desde la API */
+// Carga catálogo desde la API
 async function fetchCatalog() {
   const res = await fetch(API_URL);
   if (!res.ok) throw new Error('No se pudo cargar la API');
   const data = await res.json();
-  // El JSON de ejemplo usa "SKU" en mayúsculas y "price" como string.
   const currency = (data.currency ?? '€').trim();
   const catalogo = (data.products ?? []).map(p => ({
     sku: (p.SKU ?? p.sku ?? '').toString(),
@@ -42,7 +33,7 @@ async function fetchCatalog() {
   return { currency, catalogo };
 }
 
-/** Pinta el catálogo en el DOM */
+// Renderiza el catálogo completo
 function renderCatalog(carrito) {
   $list.innerHTML = '';
   const { products } = carrito.obtenerCarrito();
@@ -66,24 +57,24 @@ function renderCatalog(carrito) {
   }
 }
 
-/** Actualiza el total mostrado */
+// Actualiza el total en el DOM
 function updateTotal(carrito) {
   const { total, currency } = carrito.obtenerCarrito();
   $total.textContent = formatCurrency(total, currency);
 }
 
-/** Guarda en localStorage */
+// Guarda el carrito en localStorage
 function persist(carrito) {
   localStorage.setItem(LS_KEY, carrito.toJSON());
 }
 
-/** Intenta restaurar desde localStorage */
+// Restaura el carrito desde localStorage
 function restore(carrito) {
   const raw = localStorage.getItem(LS_KEY);
   if (raw) carrito.fromJSON(raw);
 }
 
-/** Maneja todos los clicks de + / - con delegación */
+// Maneja todos los clicks de + / - con delegación
 function handleClicks(ev, carrito) {
   const btn = ev.target.closest('button[data-act]');
   if (!btn) return;
@@ -92,6 +83,7 @@ function handleClicks(ev, carrito) {
   const act = btn.dataset.act;
   const next = act === 'inc' ? current + 1 : Math.max(0, current - 1);
   carrito.actualizarUnidades(sku, next);
+  
   // Refrescar el input correspondiente
   const input = $list.querySelector(`input[data-sku="${CSS.escape(sku)}"]`);
   if (input) input.value = String(next);
@@ -99,7 +91,7 @@ function handleClicks(ev, carrito) {
   persist(carrito);
 }
 
-/** Maneja cambios en inputs numéricos */
+// Maneja cambios en inputs numéricos
 function handleInput(ev, carrito) {
   const input = ev.target.closest('input[type="number"][data-sku]');
   if (!input) return;
@@ -111,22 +103,17 @@ function handleInput(ev, carrito) {
   persist(carrito);
 }
 
-/** Botón limpiar */
+// Botón limpiar
 function clearCart(carrito) {
   for (const key of carrito.lineas.keys()) carrito.actualizarUnidades(key, 0);
   updateTotal(carrito);
   persist(carrito);
+  
   // Actualiza inputs
   $list.querySelectorAll('input[type="number"][data-sku]').forEach(i => i.value = "0");
 }
 
-/** Botón dump (muestra el JSON del carrito) */
-function dumpCart(carrito) {
-  const data = carrito.obtenerCarrito();
-  $dump.textContent = JSON.stringify(data, null, 2);
-  $dump.hidden = false;
-}
-
+// Arranque de la app
 (async function main() {
   try {
     const { currency, catalogo } = await fetchCatalog();
@@ -139,10 +126,10 @@ function dumpCart(carrito) {
     $list.addEventListener('click', (e) => handleClicks(e, carrito));
     $list.addEventListener('input', (e) => handleInput(e, carrito));
     $btnClear.addEventListener('click', () => clearCart(carrito));
-    $btnDump.addEventListener('click', () => dumpCart(carrito));
 
   } catch (err) {
     console.error(err);
     $list.innerHTML = `<p>Error cargando la API. Revisa <code>API_URL</code> en <code>app.js</code>.</p>`;
   }
 })();
+

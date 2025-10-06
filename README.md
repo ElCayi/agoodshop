@@ -1,36 +1,43 @@
-# aGoodShop · Actividad 1 (Carrito)
+# aGoodShop · Actividad 1
 
-## Qué pide el profe (resumen)
-- Clase **Carrito** (POO) como núcleo **sin tocar el DOM**.
-- Cargar productos desde una **API JSON** (puedes usar jsonblob.com).
-- **DOM**: crear listado de productos, escuchar cambios de unidades y **actualizar TOTAL** en vivo.
-- Entrega: zip del proyecto + repo público.
+## Repositorio Remoto
+git@github.com:ElCayi/agoodshop.git
 
-## Estructura
+## Descripción
+Proyecto de la Actividad 1 del módulo Desarrollo Web en Entorno Cliente, centrado en implementar un carrito de compra con POO, manejo del DOM y consumo de una API externa.
+
+## Estructura del proyecto
 ```
 .
-├─ index.html
-├─ styles.css
-├─ app.js         # DOM + fetch + eventos + localStorage
-└─ carrito.js     # Lógica del carrito (total, unidades, etc.)
+├─ index.html       # Maqueta básica y estructura visual
+├─ styles.css       # Estilos mínimos para la interfaz
+├─ app.js           # Lógica de interacción con el DOM y la API
+└─ carrito.js       # Clase Carrito (POO) con cálculos y gestión de productos
 ```
 
-## Paso a paso
+## Funcionamiento
+- Se obtienen los productos desde una API externa y se muestran dinámicamente en la página.  
+- El usuario puede aumentar o disminuir las unidades de cada producto o vaciar el carrito.  
+- El total se actualiza automáticamente según las unidades seleccionadas.  
+- La aplicación no genera nuevas ventanas ni usa librerías externas; todo se gestiona desde el DOM.
 
-1. Abre **api.example.json**, cópialo y crea un JSON en **https://jsonblob.com** → Save.
-2. Copia la URL de la API (será algo como `https://jsonblob.com/api/xxxx`).  
-3. En **app.js**, pega la URL en `API_URL`.
-4. Abre `index.html` en tu navegador y prueba el carrito.
-5. (Opcional) El estado se guarda en **localStorage**; botón "Vaciar carrito" limpia cantidades.
-6. Usa "Ver JSON carrito" para ver el objeto que devolverías al backend.
+## Cambios realizados 🚨🚨
+El servicio **jsonblob.com** no funcionaba correctamente, por lo que se ha sustituido por **[Mocki.io](https://mocki.io/fake-json-api)** como servicio equivalente para simular la API de productos.
 
-## Notas técnicas
-- El JSON de ejemplo usa `SKU` (mayúsculas). En el front lo normalizamos a `sku`.
-- `price` viene como **string** → lo convertimos a `number`.
-- La clase **Carrito** expone:
-  - `actualizarUnidades(sku, unidades)`
-  - `obtenerInformacionProducto(sku)` → `{ sku, quantity }`
-  - `obtenerCarrito()` → `{ total, currency, products: [{ sku, title, price, quantity, lineTotal }] }`
-- Persistencia voluntaria con `localStorage` (`toJSON`/`fromJSON`).
+## Ejemplo de API utilizada
+```json
+{
+  "currency": "€",
+  "products": [
+    { "SKU": "0K3QOSOV4V", "title": "iFhone 13 Pro", "price": "938.99" },
+    { "SKU": "TGD5XORY1L", "title": "Cargador", "price": "49.99" },
+    { "SKU": "IOKW9BQ9F3", "title": "Funda de piel", "price": "79.99" }
+  ]
+}
+```
 
-¡Listo para entregar y pulir según las indicaciones del profe!
+## Funcionamiento básico del código
+- **`carrito.js`**: define la clase `Carrito`, responsable de almacenar productos, actualizar unidades y calcular el total.  
+- **`app.js`**: obtiene los datos de la API, genera el listado de productos y gestiona los eventos del usuario en el DOM.
+
+
